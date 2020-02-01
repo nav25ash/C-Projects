@@ -1,10 +1,11 @@
 
 #include<stdio.h>
-#include <unistd.h>
+#include<unistd.h>
 #include<time.h>
 #include<stdlib.h>
 #include<pthread.h>
 #include<string.h>
+#include <errno.h>
 
 #define NUMBER_OF_ROBOTS 2
 #define WAITING     0
@@ -22,24 +23,29 @@
 typedef struct PackageNode
 {
     int PackageNumber;
-    int ListofItems [10];
     int TotalItems;
     int Status;
+    int ListofItems [10];
+    int ItemsPending;
+    int NoItemUnavailable;
     struct PackageNode *ptr;
 }node;
 
-typedef struct robot_arm
+typedef struct __attribute__((__packed__)) robotNode
 {
     int robotNo;
-    node* pkt;
     int status;
-    struct robot_arm * ptr;
+    int count;
+    node* pkt;
+    
 }robotNode;
 
 
 
 void robot_arm (robotNode* node);
 
-node *front,*rear,*processListFront,*processListRear;
-pthread_mutex_t m1;
+
+
+node *front,*rear,*processListFront,*processListRear,*completedFront,*completedRear;
+pthread_mutex_t m1,m2;
 //sem_t signal[NUMBER_OF_ROBOTS];
